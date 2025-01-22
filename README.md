@@ -1,249 +1,388 @@
 <div align="center">
 
-# Agentic AI Safety & Security Program
+<img src="docs/images/red-team-hero.png" alt="Multi-Agent LLM Red-Team Orchestrator dashboard" width="100%">
 
-### Adversarial research, defensive playbooks, and a full certification platform — all targeting one question:
+# 🛡️ Multi-Agent LLM Red-Team Orchestrator
 
-> **How do production AI agents *actually* fail when an attacker controls the data they read?**
+### A defensive evaluation framework for discovering, measuring, and mitigating LLM-system risk
 
-[![Status](https://img.shields.io/badge/status-active%20research-1f6feb?style=for-the-badge)]()
-[![Models tested](https://img.shields.io/badge/models-Claude%20Haiku%20%7C%20Sonnet%20%7C%20Opus-d97706?style=for-the-badge)]()
-[![Attacks](https://img.shields.io/badge/attacks-26%20demos%20%7C%2024%20confirmed%20bypasses-e11d48?style=for-the-badge)]()
-[![Corpus](https://img.shields.io/badge/corpus-1%2C205%20sources-0ea5e9?style=for-the-badge)]()
-[![License](https://img.shields.io/badge/license-Research%20Artifact-6b7280?style=for-the-badge)]()
-[![Contributors welcome](https://img.shields.io/badge/contributors-welcome-22c55e?style=for-the-badge)](#contributing--we-want-collaborators)
+**Vulnerability probes · Adversarial attack strategies · Framework mappings · Guardrails · Risk assessments**
 
-**[🌐 Live Training Platform → ai.nevolin.be](https://ai.nevolin.be/)** ·
-**[Findings](attacks/demos/FINDINGS.md)** ·
-**[Mitigations](docs/mitigations/ai-agent-security-mitigations.md)** ·
-**[Methodology](METHODOLOGY.md)** ·
-**[Attack Demos](attacks/demos/)**
+[![Python](https://img.shields.io/badge/Python-3.9%E2%80%933.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Async](https://img.shields.io/badge/Execution-Async%20%26%20Parallel-7C3AED?style=for-the-badge)](https://docs.python.org/3/library/asyncio.html)
+[![DeepEval](https://img.shields.io/badge/Built%20on-DeepEval-0EA5E9?style=for-the-badge)](https://github.com/confident-ai/deepeval)
+[![Frameworks](https://img.shields.io/badge/Frameworks-OWASP%20%7C%20NIST%20%7C%20MITRE-F59E0B?style=for-the-badge)](https://www.trydeepteam.com/)
+[![License](https://img.shields.io/badge/License-Apache--2.0-22C55E?style=for-the-badge)](LICENSE.md)
 
-[![Training platform — ai.nevolin.be](docs/assets/training-platform-home.png)](https://ai.nevolin.be/)
+[Overview](#-overview) · [Capabilities](#-core-capabilities) · [Architecture](#%EF%B8%8F-orchestration-architecture) · [Quickstart](#-quickstart) · [Guardrails](#-production-guardrails) · [Safety](#-responsible-use)
 
 </div>
 
-> ⚠️ **Research artifact.** Every attacker domain, vendor name, and portal URL inside `attacks/`, `docs/mitigations/`, and `sources/` is a placeholder used for defensive testing. Do not act on any URL inside this repository.
+> [!IMPORTANT]
+> This is a defensive research and evaluation artifact. Run tests only against systems you own or are explicitly authorized to assess. Use synthetic data, isolated environments, rate limits, and non-production credentials. The visuals in this README are high-fidelity concept illustrations with simulated data, not proof of a live deployment.
 
-## Why this exists
+## 🌐 Overview
 
-Frontier LLMs no longer just answer questions — they read your Slack, your Notion, your Jira, your CI logs, your git history, your vendor registries, and they *write back into those systems*. The interesting attack surface stopped being "jailbreak the chatbot." It became **"poison the data the agent trusts."**
+The **Multi-Agent LLM Red-Team Orchestrator** packages an orchestration-first workflow for testing LLM applications, RAG pipelines, chatbots, and tool-using agents. It combines vulnerability definitions, adversarial attack strategies, an evaluation model, asynchronous execution, and a structured risk assessment so teams can move from “the model failed” to “this is the failure mode, evidence, and mitigation.”
 
-This repo is an end-to-end study of that surface, run against production Claude (Haiku, Sonnet, Opus), with three deliverables:
+The underlying Python package is `deepteam`. The portfolio project emphasizes the multi-agent operating model: a coordinator schedules bounded test work, target callbacks represent the system under test, evaluators judge outcomes, and reports preserve the evidence needed for remediation.
 
-1. **A red-team CTF harness** that reproducibly compromises agents using realistic enterprise payloads — Slack messages, calendar invites, helpdesk tickets, env files, commit bodies, error logs, vendor catalogs.
-2. **A 1,054-line defensive playbook** mapping every confirmed bypass to a concrete mitigation primitive a security team can ship.
-3. **A six-module training platform** with proctored exam and signed PDF certificates, so the people deploying these agents — leaders, IT admins, developers — can be trained against the attacks we *actually* land in production.
+### ✨ At a glance
 
-The corpus underneath all of it: **1,205 indexed sources** across ten attack taxonomies — every major paper, blog, and exploit DB entry on prompt injection, jailbreaking, agent attacks, multimodal attacks, training-data poisoning, deception/alignment failure, and AI-driven influence operations.
-
----
-
-## Headline result
-
-24 indirect prompt-injection attacks built and tested **end-to-end** against the live Claude API. Every demo is reproducible by running a single shell script.
-
-<div align="center">
-
-| Model | Verdict | Confirmed bypass mechanisms |
-|:---|:---|:---:|
-| **Claude Haiku** | Compromised by every attack tested | All |
-| **Claude Sonnet** | Robust against direct injection — fails on enterprise data sources | **16** |
-| **Claude Opus** | Most resistant — but stronger conversational defenses *amplify* data-registry attacks | **5** |
-
-</div>
-
-The single most consequential finding is **MAA1 — Multi-Agent Transitive Data Poisoning.**
-
-> A cheap upstream Haiku agent ingesting external documents gets weaponized to poison an internal vendor registry. Sonnet and Opus downstream cite that registry as policy-authoritative — turning the enterprise's *own defensive policy* into the delivery mechanism for the attacker's URL. The same defensive instruction that makes Opus harder to phish makes it more vulnerable here.
-
-Full matrix of bypasses, payloads, parameters, and detection signals: [`attacks/demos/FINDINGS.md`](attacks/demos/FINDINGS.md).
-
----
-
-## The training platform
-
-**🌐 Live at [ai.nevolin.be](https://ai.nevolin.be/)** — open in a browser, sign up, take the course, sit the exam, get a verifiable PDF certificate. No install needed.
-
-[![ai.nevolin.be — About page: We fooled AI sixteen times](docs/assets/training-platform-about.png)](https://ai.nevolin.be/about)
-
-A production Next.js 14 app under [`web/`](web/) — built so the humans deploying agents can actually internalize what these attacks look like.
-
-### Features
-
-- **Six MDX lesson modules** — prompt injection, jailbreaking, agentic attacks, multi-agent poisoning, multimodal vectors, defenses. Each module gated by a quiz; quizzes must pass to unlock the next module.
-- **40-question proctored exam** — randomized question order, 80% pass mark, fixed time budget, server-side grading via `lib/grading.ts` (Jest-covered).
-- **Signed PDF certificates** — generated with `@react-pdf/renderer` on pass; each cert carries a unique `verifyCode`.
-- **Public certificate verification** — share `/verify/[code]` to let anyone check authenticity without an account.
-- **Account + progress tracking** — NextAuth JWT credentials, Prisma 7 on LibSQL persistence, per-user lesson + quiz + exam state.
-- **Custom MDX primitives** — `Callout`, `AttackCard`, `FlowSteps`, `Diagram`, `KeyPoint`, `DoDont`, `Comparison`, `StatBar` — used across lessons for consistent visual language.
-- **Attack-vector tooltips** — hover any attack ID (`SP1`, `MAA1`, `WIKI1 v4`, …) for one-line summary + link to the reproducible demo folder on GitHub.
-- **Anime.js v4 motion** — landing-page attack-flow diagram, lesson transitions, history-spine commit timeline.
-- **Light + dark themes** — Tailwind tokens with CSS-variable overrides; persists per user.
-- **Audio narration** — pre-built TTS audio bundled per lesson (`pnpm prebuild-audio`), playback in the lesson reader.
-- **Deployed via GitHub Actions + pm2** — pushes to `main` build and ship to `ai.nevolin.be` automatically.
-
-Local setup instructions (`pnpm install`, env vars, dev/build/test): [`DETAILS.md`](DETAILS.md#run-the-training-platform-locally).
-
----
-
-## 🏆 Hackathon submission — [read the writeup →](HACKATHON.md)
-
-<div align="center">
-
-[![Built with Opus 4.7 — Claude Code global virtual hackathon, April 21–28](docs/assets/built-with-opus-4-7-hackathon-450.gif)](https://cerebralvalley.ai/e/built-with-4-7-hackathon)
-
-**Event page:** [cerebralvalley.ai/e/built-with-4-7-hackathon](https://cerebralvalley.ai/e/built-with-4-7-hackathon) · **Project writeup:** [`HACKATHON.md`](HACKATHON.md)
-
-</div>
-
-> *"In five days, one researcher and Claude Opus 4.7 broke the most capable AI on the planet — twenty-four different ways — then turned every failure into a lesson, a defense, and a public certification course."*
-
-**[`HACKATHON.md`](HACKATHON.md)** is the backstage tour judges (and curious humans) actually want:
-
-- **The MAA1 finding** — how a cheap Haiku agent gets weaponized to poison a vendor registry, and why that turns Opus's *strongest* defense into the delivery mechanism for the attacker's URL. (Yes, really.)
-- **Opus orchestrating Opus** at industrial scale — hundreds of bounded subagents, an `attacker ↔ defender` loop running model-on-model, and a persistent file-based memory that lets a fresh session resume yesterday's research cold.
-- **A behavior we did not expect to find** — Opus 4.7 actively reasoning about trust tiers across input sources, naming attack classes mid-output, quarantining suspicious data. Sonnet doesn't. Haiku doesn't. We measured it.
-- **The receipts** — 171 commits · 66 dated session logs · 253 verbatim local-LLM transcripts · 1,205 indexed sources · 27 reproducible attacks · a 1,054-line defensive playbook · a production training site shipping on `git push`.
-
-If you're judging: **start there.** If you're a defender, a researcher, or just AI-curious: **start there anyway.** Single page, narrative voice, no jargon walls.
-
----
-
-## 🛡️ The defensive playbook — [open it →](docs/mitigations/ai-agent-security-mitigations.md)
-
-> *Most "AI security" docs are theoretical threat models. This one is grounded in attacks that **actually landed** against production Claude. Every primitive in here was earned the hard way.*
-
-**[`docs/mitigations/ai-agent-security-mitigations.md`](docs/mitigations/ai-agent-security-mitigations.md)** — 1,054 lines a CISO can hand to their AI platform team on Monday and have shipping by Friday.
-
-<div align="center">
-
-| Part | What's inside | Who reads it |
-|---|---|:---:|
-| **🧭 Executive Risk Register** | Every confirmed bypass mapped to business impact, likelihood, and ownership. Boardroom-grade language; no jargon. | CISOs · risk officers · execs |
-| **🔧 Technical Playbook** | **10 defensive primitives** with concrete enforcement points: egress allowlists, MCP tool wrappers, registry-write controls, cross-source corroboration thresholds, provenance metadata, system-prompt templates, policy clauses. | Platform · security · DevOps |
-| **🩻 Attack Anatomy Cards** | **17 per-attack cards** — mechanism, parameters, detection signals that fired *and* that didn't, hardening priority. The autopsy of every attack we landed. | Detection engineers · red-teamers |
-
-</div>
-
-**Why this is different:**
-
-- 🎯 **Every primitive maps to an attack we landed.** No fictional threat actors. Real bypasses, real model versions, real dates.
-- 📜 **Drop-in policy + system-prompt templates.** Copy-paste into your agent's prompt or your IT policy doc — they're already written.
-- 🧬 **Detection-signal honesty.** Each card lists what *did* fire and what *didn't* — so your blue team knows where the heuristics actually work.
-- 🔗 **Cross-linked to the demos.** Every recommendation traces back to a `./run_demo.sh` you can re-execute against your own model.
-
-> **Grounded in attacks that landed. Not in threat models that didn't.**
-
----
-
-## What's in the box
-
-```
-.
-├── attacks/        red-team harness + 26 enterprise attack demos, one shell script each
-├── sources/        1,205 indexed papers, blogs, reports, and exploit-DB entries
-├── docs/           1,054-line mitigation playbook + design docs + risk register
-├── web/            Next.js 14 training platform (6 modules · proctored exam · signed certs)
-├── logs/           60 session logs — chronological, defender-grade research journal
-├── CLAUDE.md       living context document for agents working on this repo
-└── METHODOLOGY.md  how the research is run end-to-end
-```
-
-| Path | What it is |
+| Layer | What it provides |
 |---|---|
-| **`sources/`** | **1,205 items** across 10 taxonomy buckets — 274 papers / blogs / reports (each paired with a verbatim-first summary) and 931 Promptfoo LM Security DB exploit entries. Indexed by [`sources/INDEX.md`](sources/INDEX.md). |
-| **`attacks/`** | Red-team CTF harness running documented attack vectors against `claude -p` (Haiku / Sonnet / Opus). 26 reproducible enterprise demos under [`attacks/demos/`](attacks/demos/). Run any of them with `./run_demo.sh`. |
-| **`docs/mitigations/ai-agent-security-mitigations.md`** | The defensive deliverable. Executive risk register · 10 defensive primitives · 17 attack-anatomy cards — all grounded in the bypasses we landed, not theoretical threat models. |
-| **`web/`** | Production-grade Next.js 14 training app. Six MDX lesson modules, gated quizzes, 40-question proctored exam (shuffled order, 80% pass), `@react-pdf/renderer` certificate, public verification page at `/verify/[code]`. |
-| **`logs/`** | Every session ends with a log + a git commit. Future Claude sessions read the newest log to resume work cold. |
-| **`CLAUDE.md`** | The lived-experience context document — gotchas already paid for, working prompt patterns, environmental facts (Ollama models, sandbox layout, MCP confounds). Read before touching `attacks/`. |
-| **`METHODOLOGY.md`** | The research methodology itself: defender-side framing, verbatim-first extraction, parallel subagent fan-out, local-LLM fallback for AUP refusals. |
+| **Target callback** | A small adapter around the LLM application being assessed |
+| **Vulnerability catalog** | Privacy, safety, security, business, responsible-AI, and agentic risk classes |
+| **Attack engine** | Single-turn and multi-turn adversarial strategies selected for the chosen risks |
+| **Evaluation model** | LLM-as-a-judge scoring with reasoning and pass/fail outcomes |
+| **Orchestrator** | Async scheduling, bounded concurrency, retries, identifiers, and risk aggregation |
+| **Framework mappings** | OWASP LLM/Agent risks, NIST AI RMF, MITRE, Aegis, and BeaverTails |
+| **Guardrails** | Input/output checks with safe, borderline, unsafe, and uncertain verdicts |
+| **Code scanner** | Optional harness-backed code review that returns structured findings |
 
----
+## 🚀 Core capabilities
 
-## Methodology in one screen
+- 🎯 **Test any LLM interface** through an async `model_callback` rather than coupling the framework to one provider.
+- 🧩 **Compose vulnerability suites** or select a recognized safety framework to map categories automatically.
+- 💥 **Exercise adversarial strategies** across single-turn and multi-turn test flows without embedding operational exploit payloads in the documentation.
+- ⚡ **Run evaluations concurrently** with configurable `max_concurrent` limits and error handling.
+- 📊 **Produce risk assessments** with scores, attack traces, verdict reasoning, and mitigation-oriented findings.
+- 🛡️ **Add production guardrails** for prompt injection, privacy, toxicity, illegal activity, hallucination, topicality, and cybersecurity checks.
+- 🔎 **Scan code through optional agentic harnesses** such as Codex, Claude Code, or Cursor when explicitly configured.
+- 🧪 **Test against established taxonomies** including OWASP Top 10 for LLMs, OWASP Top 10 for Agents, NIST, MITRE ATLAS, Aegis, and BeaverTails.
 
-Full version in [`METHODOLOGY.md`](METHODOLOGY.md). The principles that produced this output:
+## 🖼️ Visual product tour
 
-- **Massively parallel subagents.** Embarrassingly parallel work (summarize 275 papers, run 24 attack demos against three models) fans out to bounded subagent briefs of 15–20 files each. Three concurrent at a time keeps account rate-limits sustainable.
-- **Defender-side framing.** "Generate attacker transcripts" trips Anthropic's Usage Policy. "Extract detection features a blue-team analyst would surface" produces the same artifact without the refusal.
-- **Verbatim-first extraction.** Real payloads in fenced code blocks come first. Extrapolated content is allowed only when explicitly labelled.
-- **Persistent session logs.** Every session ends with a log + commit. The next session reads the newest log instead of the prior transcript — recovers from compactions and context loss with near-zero re-orientation cost.
-- **Local-LLM fallback.** When Claude policy-refuses a clearly in-scope defensive task (summarizing a public paper, extracting a verbatim payload), the work hands off to local Ollama models on an M1 MBP. Every Ollama interaction is transcribed verbatim to `logs/ollama-transcripts/` as part of the audit trail.
+### 🧭 The orchestrator control plane
 
----
+The hero view represents a complete evaluation run: bounded roles coordinate test generation, target execution, evidence collection, and judging while keeping the research purpose visible.
 
-## More in [`DETAILS.md`](DETAILS.md)
 
-Supplementary reference moved out of the main README to keep it focused:
+### 🏗️ End-to-end evaluation architecture
 
-- **[The attack catalogue](DETAILS.md#the-attack-catalogue)** — 26 scripted attacks grouped by surface (Slack, calendar, helpdesk, CI logs, git, env, error logs, vendor catalogs, multi-agent), each a one-command repro with verdicts per model.
-- **[Run the training platform locally](DETAILS.md#run-the-training-platform-locally)** — `pnpm install`, Prisma migrate, env vars, build/test commands.
-- **[The corpus](DETAILS.md#the-corpus)** — ten taxonomy buckets, paper-summary pairing, Promptfoo DB scrape provenance, 1,205-item total.
-- **[Quickstart by intent](DETAILS.md#quickstart-by-intent)** — three lanes: reproduce a bypass, ship mitigations, train your team.
-- **[Reproducibility & provenance](DETAILS.md#reproducibility--provenance)** — single-command repros, session logs, Ollama transcripts, citation verification.
-- **[Project conventions](DETAILS.md#project-conventions-for-contributors-and-future-agents)** — subagent code workflow, no force-push, `<AttackRef>` discipline, light-mode CSS variables, portal rules for popovers.
+Configuration and a target callback flow through vulnerability probes, attack strategies, the target LLM, an evaluator, and a mitigation-oriented report.
 
----
+<img src="docs/images/orchestration-architecture.png" alt="LLM red-team orchestration architecture" width="100%">
 
-## Disclosure & ethical use
+### 🗺️ Risk taxonomy map
 
-This is **defensive research.** The repository exists to (a) make the failure modes of agentic systems concretely measurable, (b) give security teams a playbook grounded in attacks that actually work, and (c) train the humans deploying these systems against the attacks they will encounter.
+Use the catalog to focus an assessment on privacy, responsible AI, security, safety, business, agentic, or custom risk classes.
 
-- All vendor names, domains, and portal URLs are placeholders.
-- Attack demos target a sandboxed `claude -p` instance with a synthetic CTF system prompt.
-- No real third-party systems, accounts, or users are touched.
-- Findings on Anthropic models are reported per model + version + date — model behavior changes over time.
+<img src="docs/images/vulnerability-taxonomy.png" alt="LLM vulnerability taxonomy map" width="100%">
 
-If you build on this, keep the framing defender-first. If you find a new bypass against a frontier model, disclose to the vendor before publishing.
+### 🧪 Attack strategy matrix
 
----
+Single-turn and multi-turn strategies can be composed with vulnerability types. The intended loop is always **test → observe → report**.
 
-## Contributing — we want collaborators
+<img src="docs/images/attack-methods.png" alt="Adversarial attack strategy comparison" width="100%">
 
-**This project is actively looking for contributors.** The attack surface is expanding faster than any single researcher can keep up with, and the program's value compounds with every new bypass landed, mitigation primitive shipped, and lesson module written. If any of the following sounds like you, please open an issue or PR:
+### 🛡️ Input and output guardrails
 
-- **Red-teamers / security researchers** — propose new attack vectors, port existing demos to other frontier models (GPT, Gemini, Llama), break assumptions in the existing harness, or replicate landed bypasses against newer Claude releases.
-- **Defenders / blue-teamers** — turn the playbook's primitives into shippable code (MCP wrappers, registry-write guards, egress allowlists, provenance-tagging middleware) and contribute them as reference implementations.
-- **ML / alignment researchers** — extend the corpus, propose new taxonomy buckets, write deeper synthesis pieces across the 1,205 sources, or design evals that catch the bypass classes documented here.
-- **Educators / technical writers** — author additional lesson modules, expand the exam question bank, translate the training platform, or write executive briefings on the findings.
-- **Frontend / product engineers** — improve the training app's accessibility, add learner analytics, ship a richer certificate verification experience, or build interactive attack-flow visualizations.
-- **DevOps / platform engineers** — harden the harness, port it off macOS-specific assumptions, build CI for the demos, or wire up automated regression runs against new model versions.
+Guardrails classify model traffic before it reaches the model and before it reaches the user, returning per-guard verdicts and reasons.
 
-**How to contribute:**
+<img src="docs/images/guardrails-pipeline.png" alt="LLM input and output guardrails pipeline" width="100%">
 
-1. Read [`CLAUDE.md`](CLAUDE.md) and [`METHODOLOGY.md`](METHODOLOGY.md) — the project conventions are load-bearing.
-2. Open a GitHub Issue describing what you want to work on, or jump straight into a draft PR for small changes.
-3. Keep the framing defender-first; verbatim-first; reproducibly logged.
-4. New attack demos must include a `run_demo.sh`, a seed payload, and a verdict-log artifact from a fresh run.
-5. New lesson content goes through the MDX primitives in [`web/components/mdx/`](web/components/mdx/) — don't re-roll inline.
+### 🤖 Bounded multi-agent execution
 
-If you're unsure whether your idea fits, open an issue and ask. Speculative ideas welcome — most of what's in this repo started as one.
+The multi-agent view makes responsibilities explicit: planning, target execution, evidence collection, defender review, and final judging are separate, traceable stages.
 
-**Get in touch via GitHub** — open an [issue](https://github.com/inevolin/agentic-ai-safety-and-security-program/issues) or a [pull request](https://github.com/inevolin/agentic-ai-safety-and-security-program/pulls). All collaboration happens in the open on the tracker.
+<img src="docs/images/multi-agent-run.png" alt="Bounded multi-agent red-team run" width="100%">
 
----
+### 💻 Developer workflow
 
-## Citation
+The framework can be driven from Python or the CLI, with YAML configuration, a model callback, and a serializable risk assessment.
+
+<img src="docs/images/developer-workflow.png" alt="Developer CLI and YAML workflow" width="100%">
+
+### 📋 Evidence-first reporting
+
+Risk summaries connect severity to observed behavior, evidence traces, detection signals, and recommended mitigations.
+
+<img src="docs/images/risk-assessment.png" alt="LLM risk assessment report dashboard" width="100%">
+
+## 🏗️ Orchestration architecture
+
+```mermaid
+flowchart LR
+    C[🧑‍💻 Config] --> O[🎛️ Orchestrator]
+    O --> V[🧩 Vulnerability suite]
+    O --> A[💥 Attack engine]
+    V --> T[🎯 Target callback]
+    A --> T
+    T --> J[⚖️ Evaluation model]
+    J --> R[📊 Risk assessment]
+    R --> M[🛡️ Mitigation backlog]
+    O -. optional .-> H[🤖 Harness provider]
+```
+
+### Responsibility boundaries
+
+| Component | Responsibility |
+|---|---|
+| `model_callback` | Calls the application under test and returns its text response |
+| `RedTeamer` | Coordinates attack generation, execution, evaluation, and aggregation |
+| Vulnerabilities | Define the risk condition the evaluation is trying to expose |
+| Attacks | Generate adversarial test variations, including multi-turn strategies |
+| Simulator model | Helps produce attack inputs for the selected vulnerability |
+| Evaluation model | Judges the target response and explains the verdict |
+| `RiskAssessment` | Stores the resulting risk view for analysis and reporting |
+| Guardrails | Classify inputs/outputs independently of a red-team run |
+| Harness engines | Delegate code scanning to an explicitly selected optional provider |
+
+### 🔄 Evaluation lifecycle
+
+```text
+Select risks / framework
+          │
+          ▼
+Create target callback + execution policy
+          │
+          ▼
+Generate bounded adversarial tests
+          │
+          ▼
+Run target → capture response → evaluate evidence
+          │
+          ▼
+Aggregate scores, traces, and reasons
+          │
+          ▼
+Prioritize mitigation → re-run as regression coverage
+```
+
+## 🧠 Risk coverage
+
+### Vulnerability families
+
+| Family | Representative concerns |
+|---|---|
+| 🔐 Data privacy | PII leakage, prompt leakage, cross-context retrieval |
+| ⚖️ Responsible AI | Bias, toxicity, fairness, child protection, ethics |
+| 🧱 Security | BOLA, BFLA, RBAC, SSRF, SQL injection, shell injection, debug access |
+| 🛟 Safety | Illegal activity, graphic content, personal safety, unexpected code execution |
+| 🏢 Business | Misinformation, intellectual property, competition, topicality |
+| 🤖 Agentic | Goal theft, excessive agency, indirect instruction, tool abuse, identity abuse, agent drift |
+| 🧩 Custom | Organization-specific vulnerability criteria and metrics |
+
+### Adversarial strategy families
+
+- **Single-turn:** prompt injection, roleplay, encoding transformations, multilingual probes, context poisoning, authority escalation, and related variations.
+- **Multi-turn:** linear, tree, crescendo, sequential, and judge-manipulation strategies.
+- **Composable execution:** choose specific attacks, run an entire available suite, or allow a framework mapping to select compatible attacks.
+
+> Strategy names describe evaluation techniques. Keep payloads synthetic, non-operational, and confined to authorized test environments.
+
+## 🚀 Quickstart
+
+### Prerequisites
+
+- Python `>=3.9,<3.14`
+- Poetry or an equivalent isolated Python environment
+- An LLM provider key configured locally, never committed to source control
+- A test-only model endpoint or callback that you are authorized to evaluate
+
+### Install from the repository
+
+```bash
+git clone https://github.com/AsadAliEng/Multi-Agent-LLM-Red-Team-Orchestrator.git
+cd Multi-Agent-LLM-Red-Team-Orchestrator
+poetry install
+```
+
+For optional code-scanning harnesses, install only the provider you intend to use:
+
+```bash
+poetry install --extras harnesses
+```
+
+### Run the test suite
+
+```bash
+poetry run pytest
+```
+
+The project test configuration excludes tests marked `skip_test`; provider-backed tests may still require the relevant local SDK and credentials.
+
+### First red-team run
+
+```python
+from deepteam import red_team
+from deepteam.attacks.single_turn import PromptInjection
+from deepteam.vulnerabilities import Bias
+
+
+async def model_callback(input: str) -> str:
+    """Call your authorized test target and return its text response."""
+    return await my_test_llm(input)
+
+
+risk_assessment = red_team(
+    model_callback=model_callback,
+    vulnerabilities=[Bias(types=["race"])],
+    attacks=[PromptInjection()],
+    max_concurrent=4,
+    identifier="local-regression-run",
+)
+```
+
+The callback is the only application-specific adapter. The framework generates the test input, invokes the callback, evaluates the response, and returns a risk assessment object.
+
+### Framework-based selection
+
+```python
+from deepteam import red_team
+from deepteam.frameworks import OWASPTop10
+
+
+risk_assessment = red_team(
+    model_callback=model_callback,
+    framework=OWASPTop10(),
+    max_concurrent=4,
+)
+```
+
+Available mappings include `OWASPTop10`, `OWASP_ASI_2026`, `NIST`, `MITRE`, `Aegis`, and `BeaverTails`.
+
+## 🛡️ Production guardrails
+
+Guardrails are separate from red-team generation: they classify traffic at runtime using configured input and output guards.
+
+```python
+from deepteam import Guardrails
+from deepteam.guardrails import PromptInjectionGuard, PrivacyGuard, ToxicityGuard
+
+
+guardrails = Guardrails(
+    input_guards=[PromptInjectionGuard(), PrivacyGuard()],
+    output_guards=[ToxicityGuard()],
+    sample_rate=1.0,
+)
+
+input_result = guardrails.guard_input(user_input)
+output_result = guardrails.guard_output(user_input, model_output)
+
+if input_result.breached or output_result.breached:
+    route_to_review()
+```
+
+Each result exposes per-guard verdicts, safety level, latency, reason, score, and errors. The aggregate `breached` flag is true for `unsafe`, `borderline`, or `uncertain` verdicts.
+
+Built-in guard families include `ToxicityGuard`, `PromptInjectionGuard`, `PrivacyGuard`, `IllegalGuard`, `HallucinationGuard`, `TopicalGuard`, and `CybersecurityGuard`.
+
+## 💻 CLI and code scanning
+
+The package exposes a `deepteam` CLI for YAML-driven runs and code scanning. Optional harness providers are intentionally explicit because they execute external tools and may handle sensitive source code.
+
+```bash
+poetry run deepteam --help
+poetry run deepteam scan . --provider codex
+poetry run deepteam scan . --provider claude-code --model <model-name>
+poetry run deepteam scan . --provider cursor
+```
+
+Before using a harness:
+
+- install the matching optional extra;
+- set the provider's environment variable locally;
+- scan a deliberately scoped directory;
+- review generated findings before treating them as facts;
+- never expose production secrets, customer data, or private source without authorization.
+
+## 📦 Project structure
+
+```text
+Multi-Agent-LLM-Red-Team-Orchestrator/
+├── deepteam/
+│   ├── attacks/               # Single-turn and multi-turn strategies
+│   ├── vulnerabilities/       # Risk definitions and templates
+│   ├── frameworks/            # OWASP, NIST, MITRE, Aegis, BeaverTails
+│   ├── guardrails/            # Input/output safety guards
+│   ├── red_teamer/             # Async orchestration and risk aggregation
+│   ├── code_scanner/           # Optional harness-backed code findings
+│   └── cli/                    # YAML and scan command-line interface
+├── examples/
+│   ├── custom_red_teaming.ipynb
+│   └── code_scan_harness_example.py
+├── tests/                     # Attack, vulnerability, framework, guardrail, and scanner tests
+├── pyproject.toml             # Poetry metadata, dependencies, extras, and CLI entry point
+├── CITATION.cff
+└── LICENSE.md
+```
+
+## 🔬 Engineering notes
+
+- **Async by default:** tune `max_concurrent` to the capacity and rate limits of the test target.
+- **Pluggable models:** simulator and evaluation models are configurable; provider behavior can change over time.
+- **Evidence over anecdotes:** preserve run identifiers, model versions, timestamps, prompts, responses, and verdict reasoning under an approved retention policy.
+- **Regression-ready:** rerun a focused vulnerability/attack pair after mitigation and compare the resulting risk assessment.
+- **Optional harness isolation:** code-scanner providers are selected explicitly and should run in a sandbox with least-privilege credentials.
+
+## 🔒 Responsible use and limitations
+
+- This framework identifies risk signals; a pass/fail result is not a security certification.
+- LLM-as-a-judge can be biased, inconsistent, or vulnerable to the same context it evaluates. Use human review for high-impact decisions.
+- Attack and vulnerability inventories are not exhaustive. Add custom tests for your domain, tools, data sources, and authorization model.
+- Model versions, provider policies, prompts, and network conditions affect results. Record them with every run.
+- Never run generated tests against public services, third-party accounts, or production data without written authorization.
+- Redact secrets and personal information from logs and risk reports; set retention and access controls before sharing artifacts.
+
+## 🧭 Recommended evaluation program
+
+1. Define scope, authorization, target purpose, data handling, and stop conditions.
+2. Start with low-volume synthetic tests and a narrow vulnerability set.
+3. Add framework mappings and multi-turn strategies after the callback is stable.
+4. Review traces with security, privacy, product, and domain owners.
+5. Convert confirmed findings into mitigations, guardrails, and regression tests.
+6. Re-run after model, prompt, tool, retrieval, or policy changes.
+
+## 🤝 Contributing
+
+1. Read the project conventions and existing tests.
+2. Create a focused branch: `git checkout -b feature/your-change`.
+3. Add a deterministic test or a clearly scoped fixture for each behavior change.
+4. Keep attack examples synthetic and defender-first; never add live secrets or third-party targets.
+5. Run `poetry run pytest` and open a pull request with evidence of the result.
+
+## 📚 Origin, citation & license
+
+This portfolio presentation is based on the open-source [`confident-ai/deepteam`](https://github.com/confident-ai/deepteam) framework. The upstream project is described as an open-source LLM red-teaming framework built on DeepEval; credit for the original implementation remains with its maintainers and contributors.
 
 ```bibtex
-@misc{nevolin2026agentic,
-  title  = {Agentic AI Safety \& Security Program: Attacks, Defenses, and a Training Platform},
-  author = {Nevolin, Ilja},
-  year   = {2026},
-  howpublished = {\url{https://github.com/inevolin/agentic-ai-safety-and-security-program}},
-  note   = {Defensive research artifact — 1,205-source corpus, 26 reproducible attack demos, 1,054-line mitigation playbook, Next.js training platform.}
+@software{deepteam,
+  title = {DeepTeam: The LLM Red Teaming Framework},
+  author = {Ip, Jeffrey and Vongthongsri, Kritin},
+  version = {1.0.9},
+  year = {2026},
+  url = {https://github.com/confident-ai/deepteam}
 }
 ```
 
+Licensed under **Apache-2.0**. See [`LICENSE.md`](LICENSE.md) for the complete terms.
+
+## 👨‍💻 Developer
+
+<table>
+  <tr>
+    <td width="150" align="center">
+      <img src="https://github.com/AsadAliEng.png?size=160" width="120" alt="Asad Ali GitHub avatar"><br>
+      <strong>Asad Ali</strong>
+    </td>
+    <td>
+      <strong>AI, Blockchain & Software Engineer</strong><br><br>
+      🐙 GitHub: <a href="https://github.com/AsadAliEng">@AsadAliEng</a><br>
+      📧 Email: <a href="mailto:asadali.cryptoeng@gmail.com">asadali.cryptoeng@gmail.com</a><br>
+      🚀 Focus: intelligent systems, AI security, Web3 products, automation, and production-oriented engineering
+    </td>
+  </tr>
+</table>
+
 ---
 
 <div align="center">
 
-**Built with [Claude Code](https://claude.com/claude-code) · Opus 4.7 · Sonnet 4.6 · Haiku 4.5**
+### ⭐ Build safer AI systems through measurable, repeatable evaluation
 
-*If the most capable models are about to read everything your enterprise writes,*
-*we should know — concretely, reproducibly — how they fail when an attacker writes too.*
+**Research with guardrails. Findings with evidence. Mitigations that can be re-tested.**
 
 </div>
+

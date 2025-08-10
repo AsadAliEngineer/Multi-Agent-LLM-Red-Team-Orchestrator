@@ -184,7 +184,7 @@ Prioritize mitigation → re-run as regression coverage
 ### Install from the repository
 
 ```bash
-git clone https://github.com/AsadAliEng/Multi-Agent-LLM-Red-Team-Orchestrator.git
+git clone https://github.com/AsadAliEngineer/Multi-Agent-LLM-Red-Team-Orchestrator.git
 cd Multi-Agent-LLM-Red-Team-Orchestrator
 poetry install
 ```
@@ -364,13 +364,13 @@ Licensed under **Apache-2.0**. See [`LICENSE.md`](LICENSE.md) for the complete t
 <table>
   <tr>
     <td width="150" align="center">
-      <img src="https://github.com/AsadAliEng.png?size=160" width="120" alt="Asad Ali GitHub avatar"><br>
+      <img src="https://github.com/AsadAliEngineer.png?size=160" width="120" alt="Asad Ali GitHub avatar"><br>
       <strong>Asad Ali</strong>
     </td>
     <td>
       <strong>AI, Blockchain & Software Engineer</strong><br><br>
-      🐙 GitHub: <a href="https://github.com/AsadAliEng">@AsadAliEng</a><br>
-      📧 Email: <a href="mailto:asadali.cryptoeng@gmail.com">asadali.cryptoeng@gmail.com</a><br>
+      🐙 GitHub: <a href="https://github.com/AsadAliEngineer">@AsadAliEngineer</a><br>
+      📧 Email: <a href="mailto:asadalieng1107@gmail.com">asadalieng1107@gmail.com</a><br>
       🚀 Focus: intelligent systems, AI security, Web3 products, automation, and production-oriented engineering
     </td>
   </tr>
